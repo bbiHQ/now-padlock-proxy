@@ -2,8 +2,11 @@
   "name": "bbi-now-proxy",
   "version": 2,
   "functions": {
-    "index.js": {
+    "api/node-proxy/index.js": {
       "memory": 128
     }
-  }
+  },
+  "routes": [
+    {"src": "/(.*)", "dest": "/api/node-proxy/index.js"}
+  ]
 }

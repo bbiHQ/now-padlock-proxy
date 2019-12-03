@@ -4,7 +4,7 @@ var http = require('http'),
 //
 // Create a proxy server with custom application logic
 //
-var proxy = httpProxy.createProxyServer({changeOrigin: true});
+var proxy = httpProxy.createProxyServer({changeOrigin: true, autoRewrite: true, hostRewrite: true});
 
 //
 // Create your custom server and just call `proxy.web()` to proxy
