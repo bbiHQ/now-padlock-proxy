@@ -1,0 +1,9 @@
+{
+  "name": "bbi-now-proxy",
+  "version": 2,
+  "functions": {
+    "index.js": {
+      "memory": 128
+    }
+  }
+}
