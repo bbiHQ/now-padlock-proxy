@@ -14,10 +14,10 @@ var proxy = httpProxy.createProxyServer({changeOrigin: true, autoRewrite: true, 
 var server = http.createServer(function(req, res) {
   // You can define here your custom logic to handle the request
   // and then proxy the request.
-  
+  console.log(`path:${`https://${req.headers.host.split('.')[0]}.now.sh`}`)
   proxy.on('proxyRes', function(proxyRes, req, res) { res.setHeader('reverse-proxy', 'bbi-now'); });
-  proxy.web(req, res, { target: `https://${req.headers.host.replace('bbi.space', 'now.sh')}` });
+  proxy.web(req, res, { target: `https://${req.headers.host.split('.')[0]}.now.sh` });
 });
 
-console.log("reverse proxy for ZEIT Now started on port 3000");
+console.log("reverse proxy for ZEIT Now started on port 3000...");
 server.listen(3000);
