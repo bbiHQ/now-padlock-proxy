@@ -91,9 +91,10 @@ const server = http.createServer(function(req, res) {
             margin-bottom: 1rem;
           }
         </style>
+        
       </head>
       <body>
-        <h2>now-padlock-proxy for ${domain}</h2>
+        <h2><u>now-padlock-proxy</u> for ${domain}</h2>
         <p>Username: ${username}<br/>Password: ${password}</p>
         
         <p><ul>
@@ -103,6 +104,13 @@ const server = http.createServer(function(req, res) {
           <li><b>Encrypted Password Proxy (Complex):</b><br/>${links['hashed-long']}</li>
           <li><b>Encrypted Password Proxy (Simple):</b><br/>${links['hashed']}</li>
         </ul></p>
+        <p style="margin-top:5rem;">
+          <a href="https://zeit.co/new/project?template=https://github.com/bbiHQ/now-padlock-proxy/tree/master" target="_blank" style="display:block;margin-bottom:1rem;"><img src="https://zeit.co/button" alt="Deploy to ZEIT Now" /></a>
+          <a class="github-button" href="https://github.com/bbiHQ/now-padlock-proxy/fork" data-show-count="true" data-color-scheme="no-preference: light; light: light; dark: dark;" data-icon="octicon-repo-forked" aria-label="Fork bbiHQ/now-padlock-proxy on GitHub">Fork</a>
+          <a class="github-button" href="https://github.com/bbiHQ/now-padlock-proxy" data-show-count="true" data-color-scheme="no-preference: light; light: light; dark: dark;" data-icon="octicon-star" aria-label="Star bbiHQ/now-padlock-proxy on GitHub">Star</a>
+          
+        </p>
+        <script async defer src="https://buttons.github.io/buttons.js"></script>
       </body></html>`;
 
     res.end(html);
