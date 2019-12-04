@@ -1,5 +1,5 @@
 {
-  "name": "bbi-now-proxy",
+  "name": "now-padlock-proxy",
   "version": 2,
   "functions": {
     "api/node-proxy/index.js": {
