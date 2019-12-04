@@ -16,16 +16,19 @@ var server = http.createServer(function(req, res) {
   // and then proxy the request.
   // console.log(`path:${`https://${req.headers.host.split('.')[0]}.now.sh`}`);
 
-  
+  const subdomain = req.headers.host.split('.')[0];
+  const authRequired = subdomain.endsWith('-p');
+  const deploymentId = authRequired ? subdomain.substring(0, subdomain.length - 2) : subdomain;
+
   proxy.on('proxyRes', function(proxyRes, req, res) {
-    console.log('Raw [target] response', JSON.stringify(proxyRes.headers, true, 2));
+    // console.log('Raw [target] response', JSON.stringify(proxyRes.headers, true, 2));
     
     proxyRes.headers['x-reverse-proxy'] = "bbi-now-proxy";
     // proxyRes.headers['cache-control'] = "max-age=31536000, public";
-    console.log('Updated [proxy] response', JSON.stringify(proxyRes.headers, true, 2));
+    // console.log('Updated [proxy] response', JSON.stringify(proxyRes.headers, true, 2));
     
   });
-  proxy.web(req, res, { target: `https://${req.headers.host.split('.')[0]}.now.sh` });
+  proxy.web(req, res, { target: `https://${deploymentId}.now.sh` });
   // proxy.web(req, res, { target: `https://macao20.com` });
 });
 
