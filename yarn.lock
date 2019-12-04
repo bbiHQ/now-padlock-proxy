@@ -42,6 +42,11 @@ ms@^2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
+random-words@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/random-words/-/random-words-1.1.0.tgz#d42f9775d14ef5c58fd255968158303e1daa0a22"
+  integrity sha512-GyV8PlSmQE08S/RSCjG9Uh0uQaUC7iRpA18PWk9OSnvNCzKQ+B2NxqqN/cYBej4t7dfBWxh10KFBYSiNcg1jlg==
+
 requires-port@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/requires-port/-/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
