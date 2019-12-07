@@ -5,11 +5,8 @@ const crypto = require('crypto');
 const randomWords = require('random-words');
 
 const FLAGS = {
-  SIMPLE: '-p',
-  HASHLONG: '-h32',
-  HASH: '-h',
-  ENCRYPT: '-e',
-  GENERATOR: '-generate'
+  OPEN: '-o',
+  LOCKED: '-l'
 }
 
 
@@ -21,42 +18,28 @@ const server = http.createServer(function(req, res) {
 
   const subdomain = req.headers.host.split(/\.(.*)/).filter(Boolean)[0];
   
-  const authRequired = subdomain.endsWith(FLAGS.SIMPLE) || subdomain.endsWith(FLAGS.HASHLONG) || subdomain.endsWith(FLAGS.HASH);
-  const authMode = !authRequired 
-                    ? undefined
-                    : subdomain.endsWith(FLAGS.SIMPLE) 
-                    ? "simple"
-                    : subdomain.endsWith(FLAGS.HASHLONG) 
-                    ? "hashed-long"
-                    : subdomain.endsWith(FLAGS.HASH)
-                    ? "hashed"
-                    : undefined;
-  
-  const generatorMode = subdomain.endsWith(FLAGS.GENERATOR) ? "generator" : subdomain.endsWith(FLAGS.ENCRYPT) ? "encrypt" : undefined;
-
-  // just in case
-  if (authRequired && !authMode) {
-    res.statusCode = 400;
-    res.end('Bad request.');
-  }
+  const appMode = subdomain.endsWith(FLAGS.OPEN) 
+                  ? "open"
+                  : subdomain.endsWith(FLAGS.LOCKED) 
+                  ? "locked"
+                  : 'generate';
 
 
   
   
   const subdomainTokens = subdomain.split(/(^.*)-(.*)-(.*)/).filter(Boolean);
 
-  const deploymentId = (authRequired || generatorMode === 'encrypt')
+  const deploymentId = (appMode !== 'generate')
                         ? subdomainTokens[0] 
-                        : generatorMode === 'generator' 
-                        ? `${subdomainTokens[0]}-${subdomainTokens[1]}` 
                         : subdomain;
   
-  const password = (authRequired || generatorMode === 'encrypt') ? subdomainTokens[1] : generatorMode === 'generator' ? randomWords({ exactly: 4, join: '-' }) : undefined;
+
+  const password = appMode === 'generate' ? randomWords({ exactly: 4, join: '-' }) : subdomainTokens[1];
   const username = deploymentId.split(/(^.*)-(.*)/).filter(Boolean)[0];
 
-  if (authRequired) {
+  if (appMode === 'locked') {
     const credentials = auth(req);
-    if (!credentials || !isAuthed(credentials, username, password, authMode)) {
+    if (!credentials || !isAuthed(credentials, username, password, appMode)) {
       res.statusCode = 401;
       res.setHeader('WWW-Authenticate', 'Basic realm="example"');
       res.end('Access denied.');
@@ -64,9 +47,9 @@ const server = http.createServer(function(req, res) {
       // do nothing
       // res.end('Access granted')
     }
-  }
+  } else if (appMode === 'open') {
 
-  if (generatorMode !== undefined) {
+  } else if (appMode === 'generate') {
     res.statusCode = 200;
     
     const domain = req.headers.host.split(/\.(.*)/).filter(Boolean)[1];
@@ -74,9 +57,7 @@ const server = http.createServer(function(req, res) {
     const links = {
       'target': `https://${deploymentId}.now.sh${req.url}`,
       'passthrough': `https://${deploymentId}.${domain}${req.url}`,
-      'simple': `https://${deploymentId}-${password}${FLAGS.SIMPLE}.${domain}${req.url}`,
-      'hashed-long': `https://${deploymentId}-${crypto.createHash('md5').update(password).digest('hex')}${FLAGS.HASHLONG}.${domain}${req.url}`,
-      'hashed': `https://${deploymentId}-${crypto.createHash('md5').update(password).digest('hex').substring(0,7)}${FLAGS.HASH}.${domain}${req.url}`
+      'locked': `https://${deploymentId}-${crypto.createHash('md5').update(password).digest('hex').substring(0,7)}${FLAGS.LOCKED}.${domain}${req.url}`
     }
 
     const html = `<html>
@@ -90,19 +71,22 @@ const server = http.createServer(function(req, res) {
           li{
             margin-bottom: 1rem;
           }
+          #password {
+            width: 50%;
+            height: 2rem;
+          }
         </style>
         
       </head>
       <body>
         <h2><u>now-padlock-proxy</u> for ${domain}</h2>
-        <p>Username: ${username}<br/>Password: ${password}</p>
+        <p>Username: ${username}<br/>Password: <input id="password" value="${password}"/></p>
         
         <p><ul>
           <li><b>Now Deployment:</b><br/>${links['target']}</li>
           <li><b>Open Proxy:</b><br/>${links['passthrough']}</li>
-          <!--<li><b>Simple Password Proected Proxy:</b><br/>${links['simple']}</li>-->
-          <li><b>Encrypted Password Proxy (Complex):</b><br/>${links['hashed-long']}</li>
-          <li><b>Encrypted Password Proxy (Simple):</b><br/>${links['hashed']}</li>
+          
+          <li><b>Password Protected:</b><br/>${links['locked']}</li>
         </ul></p>
         <p style="margin-top:5rem;">
           <a href="https://zeit.co/new/project?template=https://github.com/bbiHQ/now-padlock-proxy/tree/master" target="_blank" style="display:block;margin-bottom:1rem;"><img src="https://zeit.co/button" alt="Deploy to ZEIT Now" /></a>
@@ -137,13 +121,9 @@ server.listen(3000);
 
 
 
-const isAuthed = function (credentials, username, password, authMode) {
+const isAuthed = function (credentials, username, password, appMode) {
 
-  if (authMode === 'simple') {
-    return credentials.name === username && credentials.pass === password;
-  } else if (authMode === 'hashed-long') {
-    return credentials.name === username && crypto.createHash('md5').update(credentials.pass).digest('hex') === password;
-  } else if (authMode === 'hashed') {
+  if (authMode === 'locked') {
     return credentials.name === username && crypto.createHash('md5').update(credentials.pass).digest('hex').substring(0,7) === password;
   }
 }
