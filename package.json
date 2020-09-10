@@ -19,7 +19,7 @@
   "homepage": "https://github.com/bbiHQ/now-padlock-proxy#readme",
   "dependencies": {
     "basic-auth": "^2.0.1",
-    "http-proxy": "^1.18.0",
+    "http-proxy": "^1.18.1",
     "random-words": "^1.1.0"
   }
 }
